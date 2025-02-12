@@ -8,11 +8,8 @@
 import Foundation
 import UIKit
 
-final class StorageManager {
-    static let shared = StorageManager()
+final class StorageManager: StorageManagerProtocol {
     private let charactersKey = "charactersKey"
-
-    private init() {}
 
     func saveCharacters(_ characters: [Character]) {
         do {
@@ -21,10 +18,6 @@ final class StorageManager {
         } catch {
             print("Failed to encode characters: \(error)")
         }
-    }
-
-    func saveImage(_ image: Data, key: String) {
-        UserDefaults.standard.set(image, forKey: key)
     }
 
     func loadCharacters() -> [Character]? {
@@ -41,12 +34,16 @@ final class StorageManager {
         }
     }
 
-    func loadImage(key: String) -> Data? {
-        return UserDefaults.standard.data(forKey: key)
-    }
-
     func clearCharacters() {
         UserDefaults.standard.removeObject(forKey: charactersKey)
+    }
+
+    func saveImage(_ image: Data, key: String) {
+        UserDefaults.standard.set(image, forKey: key)
+    }
+
+    func loadImage(key: String) -> Data? {
+        return UserDefaults.standard.data(forKey: key)
     }
 
     func clearImage(key: String) {

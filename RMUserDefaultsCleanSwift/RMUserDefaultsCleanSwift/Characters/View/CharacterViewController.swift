@@ -8,14 +8,21 @@
 import UIKit
 import SnapKit
 
+protocol CharacterViewProtocol: AnyObject {
+    func displayCharacters(viewModel: [CharacterViewModel])
+    func displayError(_ message: String)
+}
+
 final class CharacterViewController: UIViewController {
+    var interactor: CharacterInteractorProtocol?
+
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
         return tableView
     }()
 
-    var characters = [Character]()
+    var characters = [CharacterViewModel]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,27 +52,26 @@ final class CharacterViewController: UIViewController {
     }
 
     private func getCharacters() {
-        if let savedCharacters = StorageManager.shared.loadCharacters() {
-            characters = savedCharacters
-            tableView.reloadData()
-            return
-        }
-
-        NetworkManager.shared.getCharacters { [weak self] result in
-            switch result {
-            case .success(let character):
-                DispatchQueue.main.async {
-                    self?.characters = character
-                    self?.tableView.reloadData()
-                    StorageManager.shared.saveCharacters(character)
-                }
-            case .failure(let error):
-                print("Failed to fetch drinks: \(error.localizedDescription)")
-            }
-        }
+        interactor?.getCharacters()
     }
 }
 
+// MARK: - CharacterViewProtocol
+extension CharacterViewController: CharacterViewProtocol {
+    func displayCharacters(viewModel: [CharacterViewModel]) {
+        self.characters = viewModel
+        tableView.reloadData()
+    }
+
+    func displayError(_ message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(okAction)
+        present(alert, animated: true)
+    }
+}
+
+// MARK: - UITableViewDataSource
 extension CharacterViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return characters.count
@@ -79,11 +85,10 @@ extension CharacterViewController: UITableViewDataSource {
         }
 
         let character = characters[indexPath.row]
-        let imageURL = character.image
 
-        NetworkManager.shared.loadImage(from: imageURL) { loadedImage in
+        interactor?.loadImage(for: character) { loadedImage in
             DispatchQueue.main.async {
-                guard let cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell  else {
+                guard let cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {
                     return
                 }
                 cell.configure(with: character, image: loadedImage)
@@ -94,6 +99,7 @@ extension CharacterViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension CharacterViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         128
