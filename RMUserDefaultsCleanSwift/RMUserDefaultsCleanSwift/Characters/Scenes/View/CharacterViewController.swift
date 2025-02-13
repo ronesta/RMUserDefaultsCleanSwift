@@ -8,11 +8,6 @@
 import UIKit
 import SnapKit
 
-protocol CharacterViewProtocol: AnyObject {
-    func displayCharacters(viewModel: [CharacterViewModel])
-    func displayError(_ message: String)
-}
-
 final class CharacterViewController: UIViewController {
     var interactor: CharacterInteractorProtocol?
 
@@ -22,7 +17,7 @@ final class CharacterViewController: UIViewController {
         return tableView
     }()
 
-    var characters = [CharacterViewModel]()
+    var characters = [Character]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,14 +47,14 @@ final class CharacterViewController: UIViewController {
     }
 
     private func getCharacters() {
-        interactor?.getCharacters()
+        interactor?.getCharacters(request: CharacterModel.Request())
     }
 }
 
 // MARK: - CharacterViewProtocol
 extension CharacterViewController: CharacterViewProtocol {
-    func displayCharacters(viewModel: [CharacterViewModel]) {
-        self.characters = viewModel
+    func displayCharacters(viewModel: CharacterModel.ViewModel) {
+        self.characters = viewModel.characters
         tableView.reloadData()
     }
 
@@ -109,4 +104,3 @@ extension CharacterViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }
-

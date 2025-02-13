@@ -1,5 +1,5 @@
 //
-//  CharactersList.swift
+//  CharacterList.swift
 //  RMUserDefaultsCleanSwift
 //
 //  Created by Ибрагим Габибли on 12.02.2025.
@@ -7,9 +7,8 @@
 
 import Foundation
 
-enum CharactersList {
+enum CharacterModel {
     struct Request {
-        // Можем использовать для фильтрации списка или пагинации (если требуется)
     }
 
     struct Response {
@@ -17,6 +16,6 @@ enum CharactersList {
     }
 
     struct ViewModel {
-        let characters: [CharacterViewModel]
+        let characters: [Character]
     }
 }

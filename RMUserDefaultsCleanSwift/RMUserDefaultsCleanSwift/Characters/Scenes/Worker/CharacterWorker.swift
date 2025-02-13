@@ -8,11 +8,6 @@
 import Foundation
 import UIKit
 
-protocol CharacterWorkerProtocol {
-    func getCharacters(completion: @escaping ([Character]) -> Void)
-    func loadImage(for character: CharacterViewModel, completion: @escaping (UIImage?) -> Void)
-}
-
 final class CharacterWorker: CharacterWorkerProtocol {
     var networkManager: NetworkManagerProtocol
     var storageManager: StorageManagerProtocol
@@ -42,7 +37,7 @@ final class CharacterWorker: CharacterWorkerProtocol {
         }
     }
 
-    func loadImage(for character: CharacterViewModel, completion: @escaping (UIImage?) -> Void) {
+    func loadImage(for character: Character, completion: @escaping (UIImage?) -> Void) {
         networkManager.loadImage(from: character.image, completion: completion)
     }
 }
